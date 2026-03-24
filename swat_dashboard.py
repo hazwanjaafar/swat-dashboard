@@ -10,12 +10,13 @@ st.markdown("Visualizing Cyber-Physical System (CPS) states and sensor correlati
 
 # --- 2. Data Ingestion ---
 @st.cache_data
-def load_data(file_path):
+def load_data(file_obj):
     # Load dataset; note: SWaT often has leading/trailing spaces in headers
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_obj)
     df.columns = df.columns.str.strip()
     # Convert Timestamp to datetime if not already
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    if 'Timestamp' in df.columns:
+        df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
     return df
 
 # UPLOADER: For user to drop the SWaT CSV file
@@ -66,8 +67,8 @@ if uploaded_file:
         
         fig = go.Figure()
         # Adding chemical sensors
-        for sensor in ['AIT201', 'AIT202', 'AIT203']:
-            fig.add_trace(go.Scatter(x=display_df['Timestamp'], y=display_df[sensor], name=sensor))
+        for sensor_id in ['AIT201', 'AIT202', 'AIT203']:
+            fig.add_trace(go.Scatter(x=display_df['Timestamp'], y=display_df[sensor_id], name=sensor_id))
 
     # General Layout Updates
     fig.update_layout(height=700, template="plotly_dark", hovermode="x unified")
